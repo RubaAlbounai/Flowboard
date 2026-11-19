@@ -18,7 +18,7 @@ You need PHP 8.0.2 or newer, Composer and MySQL.
 
 ```bash
 git clone https://github.com/RubaAlbounai/Flowboard.git
-cd To-do-list
+cd Flowboard
 composer install
 cp .env.example .env
 php artisan key:generate
