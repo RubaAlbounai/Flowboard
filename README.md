@@ -17,7 +17,7 @@ There are two parts: a REST API in Laravel, and a front end in `public/` (a land
 You need PHP 8.0.2 or newer, Composer and MySQL.
 
 ```bash
-git clone https://github.com/RubaAlbounai/To-do-list.git
+git clone https://github.com/RubaAlbounai/Flowboard.git
 cd To-do-list
 composer install
 cp .env.example .env
