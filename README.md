@@ -1,66 +1,73 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Flowboard
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A small project manager built with Laravel and plain JavaScript. You sign up, create projects and move tasks across a board (To do, In progress, Done), a bit like a very reduced Trello or ClickUp. I built it to practise authentication, relationships between models, ordering and testing.
 
-## About Laravel
+There are two parts: a REST API in Laravel, and a front end in `public/` (a landing page, sign in and register pages, and the app itself). No build step and no framework on the front end.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## What it does
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- Sign up and log in. Every user only sees their own projects.
+- Projects with a name, a colour and a description, and a progress bar.
+- Tasks with a title, description, status, priority (low, normal, high, urgent) and due date.
+- Board view with drag and drop between columns, or list view. The order of the cards is saved.
+- Search and a priority filter. Overdue and soon-due dates are highlighted.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Run it locally
 
-## Learning Laravel
+You need PHP 8.0.2 or newer, Composer and MySQL.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+```bash
+git clone https://github.com/RubaAlbounai/To-do-list.git
+cd To-do-list
+composer install
+cp .env.example .env
+php artisan key:generate
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Create a database called `todo_list` (or change `DB_DATABASE` in `.env`), then:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```bash
+php artisan migrate --seed
+php artisan serve
+```
 
-## Laravel Sponsors
+Open http://127.0.0.1:8000. The seeder adds a demo account with two projects: `demo@example.com` / `password`. It is only meant for local use.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+## API
 
-### Premium Partners
+Everything except `register` and `login` needs the header `Authorization: Bearer <token>`.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+| Method | URL | What it does |
+| --- | --- | --- |
+| POST | `/api/register` | Create an account, returns the user and a token |
+| POST | `/api/login` | Returns the user and a token |
+| POST | `/api/logout` | Deletes the current token |
+| GET | `/api/user` | The logged-in user |
+| GET, POST | `/api/projects` | List your projects (with task counts) or create one |
+| GET, PUT, DELETE | `/api/projects/{id}` | Show, rename or delete a project (deleting also deletes its tasks) |
+| GET | `/api/projects/{id}/tasks` | Tasks of a project, in board order. Filters: `status`, `priority`, `search` |
+| POST | `/api/projects/{id}/tasks` | Add a task to the bottom of its column |
+| GET, PUT, DELETE | `/api/tasks/{id}` | Show, update or delete a task |
+| POST | `/api/tasks/{id}/move` | Move a task: `{"status": "done", "position": 0}` |
 
-## Contributing
+Statuses are `pending`, `in-progress` and `done`. Responses: `200`/`201` on success, `401` without a valid token, `404` for something that does not exist or belongs to somebody else, `422` for invalid data.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+The file `To do list Postman.postman_collection.json` has a request for each endpoint. Run "Log in" first, it saves the token for the other requests.
 
-## Code of Conduct
+## How the order of cards works
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Each task has a `position` inside its column. A new task goes to the bottom. When a card is moved, the server rebuilds the positions of the target column (and of the old one if the status changed) as 0, 1, 2... so there are no gaps. Deleting a task closes the gap the same way.
 
-## Security Vulnerabilities
+## Tests
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+php artisan test
+```
 
-## License
+They use an in-memory SQLite database, so the `pdo_sqlite` PHP extension must be enabled. They cover registration and login, the projects of one user being hidden from another, validation, filters, moving and re-ordering cards, and deleting.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Limits
+
+- Projects belong to one user. There are no teams, assignees or comments yet.
+- The three statuses are fixed.
+- Tokens do not expire.

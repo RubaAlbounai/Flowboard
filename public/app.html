@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/app.css">
+<title>Flowboard</title>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="/index.html"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span> Flowboard</a>
+    <div>
+      <div class="side-title"><span>Projects</span><button class="icon-btn" id="new-project" type="button" aria-label="New project" title="New project">+</button></div>
+      <nav class="project-list" id="project-list" aria-label="Projects"></nav>
+    </div>
+    <div class="user-box">
+      <span class="avatar" id="avatar" aria-hidden="true"></span>
+      <span class="who" id="who"></span>
+      <button class="btn btn-ghost btn-sm" id="logout" type="button">Log out</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar" id="topbar">
+      <button class="icon-btn menu-btn" id="menu-btn" type="button" aria-label="Open the project list">&#9776;</button>
+      <h1 id="project-title"></h1>
+      <div class="progress" id="progress"></div>
+      <span class="spacer"></span>
+      <label class="sr-only" for="search">Search tasks</label>
+      <input class="field toolbar-field" id="search" type="search" placeholder="Search tasks" autocomplete="off">
+      <label class="sr-only" for="priority-filter">Filter by priority</label>
+      <select class="field toolbar-field" id="priority-filter" style="width:auto">
+        <option value="">All priorities</option>
+        <option value="urgent">Urgent</option>
+        <option value="high">High</option>
+        <option value="normal">Normal</option>
+        <option value="low">Low</option>
+      </select>
+      <div class="seg" role="group" aria-label="View">
+        <button type="button" data-view="board">Board</button>
+        <button type="button" data-view="list">List</button>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="edit-project" type="button">Edit project</button>
+      <button class="btn btn-primary btn-sm" id="new-task" type="button">New task</button>
+    </header>
+    <section class="content" id="content" aria-live="polite"></section>
+  </main>
+</div>
+
+<div class="modal" id="task-modal" role="dialog" aria-modal="true" aria-labelledby="task-modal-title">
+  <div class="modal-card">
+    <h2 id="task-modal-title">New task</h2>
+    <form id="task-form" novalidate>
+      <div class="form-error" id="task-error" role="alert"></div>
+      <label class="l">Title<input class="field" id="t-title" type="text" required maxlength="255"></label>
+      <label class="l">Description<textarea class="field" id="t-desc" rows="3"></textarea></label>
+      <div class="row-3">
+        <label class="l">Status<select class="field" id="t-status">
+          <option value="pending">To do</option><option value="in-progress">In progress</option><option value="done">Done</option></select></label>
+        <label class="l">Priority<select class="field" id="t-priority">
+          <option value="low">Low</option><option value="normal">Normal</option><option value="high">High</option><option value="urgent">Urgent</option></select></label>
+        <label class="l">Due date<input class="field" id="t-due" type="date"></label>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-danger left" id="t-delete" type="button">Delete</button>
+        <button class="btn btn-ghost" type="button" data-close>Cancel</button>
+        <button class="btn btn-primary" id="t-save" type="submit">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal" id="project-modal" role="dialog" aria-modal="true" aria-labelledby="project-modal-title">
+  <div class="modal-card">
+    <h2 id="project-modal-title">New project</h2>
+    <form id="project-form" novalidate>
+      <div class="form-error" id="project-error" role="alert"></div>
+      <label class="l">Name<input class="field" id="p-name" type="text" required maxlength="100"></label>
+      <label class="l">Description<textarea class="field" id="p-desc" rows="2" maxlength="1000"></textarea></label>
+      <div class="l">Colour<div class="swatches" id="swatches"></div></div>
+      <div class="modal-actions">
+        <button class="btn btn-danger left" id="p-delete" type="button">Delete project</button>
+        <button class="btn btn-ghost" type="button" data-close>Cancel</button>
+        <button class="btn btn-primary" id="p-save" type="submit">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>
