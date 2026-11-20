@@ -1,0 +1,21 @@
+# Optional: lets Render set the service up from this file (a "Blueprint").
+# You can also enter the same values by hand in the Render dashboard.
+services:
+  - type: web
+    name: flowboard
+    runtime: docker
+    plan: free
+    healthCheckPath: /index.html
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: DB_CONNECTION
+        value: sqlite
+      - key: DB_DATABASE
+        value: /var/www/html/database/database.sqlite
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: APP_KEY
+        sync: false   # paste the value of: php artisan key:generate --show
